@@ -4,6 +4,8 @@ const graphqlHttp = require('express-graphql');
 const { buildSchema } = require('graphql');
 const mongoose = require('mongoose');
 const Event = require('./models/event');
+const User = require('./models/user');
+const bcrypt = require('bcryptjs');
 
 const app = express();
 app.use(bodyPraser.json());
@@ -63,17 +65,43 @@ app.use(
           description: args.eventInput.description,
           price: +args.eventInput.price,
           date: new Date(args.eventInput.date),
+          creator: '630e85c34c3ac05f30a5a95d',
         });
+        let createdEvent;
         return event
           .save()
           .then((res) => {
-            return { ...res._doc };
+            createdEvent = { ...res._doc };
+            return User.findById('630e85c34c3ac05f30a5a95d');
+          })
+          .then((user) => {
+            if (user) {
+              throw new Error('User existing already.');
+            }
+            user.createdEvents.push(event);
+            return user.save();
+          })
+          .then((res) => {
+            return createdEvent;
           })
           .catch((err) => {
             throw err;
           });
       },
-      // createUser: args => {}
+      createUser: async (args) => {
+        const existingUser = await User.findOne({
+          email: args.userInput.email,
+        });
+        if (existingUser) throw new Error('User exists already');
+
+        const hashedPassword = await bcrypt.hash(args.userInput.password, 12);
+        const user = new User({
+          email: args.userInput.email,
+          password: hashedPassword,
+        });
+        const result = await user.save();
+        return { ...result._doc };
+      },
     }, // this object have all resolvers functions (logic of the schema)
     graphiql: true,
   })
