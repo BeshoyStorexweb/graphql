@@ -3,9 +3,9 @@ const bodyPraser = require('body-parser');
 const graphqlHttp = require('express-graphql');
 const { buildSchema } = require('graphql');
 const mongoose = require('mongoose');
+const Event = require('./models/event');
 
 const app = express();
-const events = [];
 app.use(bodyPraser.json());
 
 app.use(
@@ -26,6 +26,17 @@ app.use(
           price: Float!
           date: String!
         }
+
+        type User {
+          _id: ID!
+          email: String!
+          password: String
+        }
+
+        input UserInput{
+          email: String!
+          password: String!
+        }
         
         type RootQuery {
             events: [Event!]!
@@ -33,6 +44,7 @@ app.use(
 
         type RootMutation {
             createEvent(eventInput: EventInput): Event
+            createUser(userInput: UserInput): User
         }
 
         schema {
@@ -41,20 +53,27 @@ app.use(
         }
     `),
     rootValue: {
-      events: (args) => {
-        return events;
+      events: async (args) => {
+        const events = await Event.find();
+        return events.map((e) => ({ ...e._doc }));
       },
       createEvent: (args) => {
-        const event = {
-          _id: Math.random().toString(),
+        const event = new Event({
           title: args.eventInput.title,
           description: args.eventInput.description,
           price: +args.eventInput.price,
-          date: new Date().toISOString(),
-        };
-        events.push(event);
-        return event;
+          date: new Date(args.eventInput.date),
+        });
+        return event
+          .save()
+          .then((res) => {
+            return { ...res._doc };
+          })
+          .catch((err) => {
+            throw err;
+          });
       },
+      // createUser: args => {}
     }, // this object have all resolvers functions (logic of the schema)
     graphiql: true,
   })
@@ -62,7 +81,7 @@ app.use(
 
 mongoose
   .connect(
-    `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.irteb.mongodb.net/events?retryWrites=true&w=majority`
+    `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.irteb.mongodb.net/${process.env.MONGO_DB}?retryWrites=true&w=majority`
   )
   .then(() => {
     app.listen(3000);
