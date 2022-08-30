@@ -8,7 +8,7 @@ app.use(bodyPraser.json());
 
 app.use(
   "/graphql",
-  graphqlHttp({
+  graphqlHttp.graphqlHTTP({
     schema: buildSchema(`
         type RootQuery {
             events: [String!]
@@ -37,6 +37,4 @@ app.use(
   })
 );
 
-app.listen(3000, () => {
-  console.log("Hello");
-});
+app.listen(3000);
