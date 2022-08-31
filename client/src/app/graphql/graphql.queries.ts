@@ -25,3 +25,11 @@ export const CREATE_EVENT = gql`
     }
   }
 `;
+export const EVENTS = gql`
+  query {
+    events {
+      _id
+      
+    }
+  }
+`;
