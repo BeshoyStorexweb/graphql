@@ -1,0 +1,37 @@
+<header class="main-navigation">
+  <div class="main-navigation__logo">
+    <h1>EasyEvent</h1>
+  </div>
+  <nav class="main-navigation__items">
+    <ul>
+      <li>
+        <a
+          routerLink="/"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          Events
+        </a>
+        <a
+          routerLink="/bookings"
+          routerLinkActive="active"
+          *ngIf="userService.isAuth()"
+          >Bookings</a
+        >
+        <a
+          routerLink="/auth"
+          routerLinkActive="active"
+          *ngIf="!userService.isAuth()"
+          >Authenticate</a
+        >
+        <button
+          type="button"
+          *ngIf="userService.isAuth()"
+          (click)="userService.logout()"
+        >
+          Logout
+        </button>
+      </li>
+    </ul>
+  </nav>
+</header>

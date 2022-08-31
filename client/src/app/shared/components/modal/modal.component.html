@@ -1,0 +1,10 @@
+<div class="modal">
+  <header class="modal__header">{{ title }}</header>
+  <section class="modal__content">
+    <ng-content></ng-content>
+  </section>
+  <section class="modal__actions">
+    <button class="btn" (click)="cancelModal()">Cancel</button>
+    <button class="btn" (click)="confirmModal()">Confirm</button>
+  </section>
+</div>

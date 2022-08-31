@@ -1,0 +1,33 @@
+<app-modal
+  *ngIf="creating"
+  title="Add Event"
+  [canCancel]="true"
+  [canConfirm]="true"
+  (onCancel)="closeModal()"
+  (onConfirm)="onConfirm()"
+>
+  <form [formGroup]="eventForm" (ngSubmit)="onConfirm()">
+    <div class="form-control">
+      <label for="title">Title</label>
+      <input type="text" formControlName="title" id="title" />
+    </div>
+    <div class="form-control">
+      <label for="title">Price</label>
+      <input type="number" formControlName="price" id="price" />
+    </div>
+    <div class="form-control">
+      <label for="date">Date</label>
+      <input type="date" formControlName="date" id="date" />
+    </div>
+    <div class="form-control">
+      <label for="description">Description</label>
+      <textarea name="description" id="" cols="30" rows="4" formControlName="description"></textarea>
+    </div>
+  </form>
+</app-modal>
+<app-backdrop *ngIf="creating"></app-backdrop>
+
+<div class="events-control">
+  <p>Share your new event</p>
+  <button class="btn" (click)="startAddEvent()">Create Event</button>
+</div>
